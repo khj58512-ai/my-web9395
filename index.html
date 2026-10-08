@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>외출 준비물 체크</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background-color: #f3f4f6;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .container {
+      background-color: #ffffff;
+      padding: 30px;
+      border-radius: 16px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+      width: 100%;
+      max-width: 400px;
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 1.5rem;
+      color: #10b981;
+      margin-bottom: 20px;
+    }
+
+    .input-group {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+
+    .item-input {
+      flex: 1;
+      padding: 10px 14px;
+      font-size: 0.95rem;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      outline: none;
+    }
+
+    .item-input:focus {
+      border-color: #10b981;
+    }
+
+    .add-btn {
+      padding: 10px 16px;
+      background-color: #10b981;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .add-btn:hover {
+      background-color: #059669;
+    }
+
+    .item-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 24px;
+      text-align: left;
+    }
+
+    .item-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 14px;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      background-color: #ffffff;
+      transition: background-color 0.15s;
+    }
+
+    .item-row:hover {
+      background-color: #f9fafb;
+    }
+
+    .item-label {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 1rem;
+      color: #374151;
+      cursor: pointer;
+      flex: 1;
+      user-select: none;
+    }
+
+    .item-label input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      accent-color: #10b981;
+      cursor: pointer;
+    }
+
+    .delete-btn {
+      background: none;
+      border: none;
+      color: #9ca3af;
+      font-size: 1.1rem;
+      cursor: pointer;
+      padding: 4px 6px;
+      border-radius: 4px;
+      line-height: 1;
+    }
+
+    .delete-btn:hover {
+      color: #ef4444;
+      background-color: #fee2e2;
+    }
+
+    .check-btn {
+      width: 100%;
+      padding: 12px;
+      font-size: 1rem;
+      font-weight: 600;
+      color: #ffffff;
+      background-color: #10b981;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+
+    .check-btn:hover {
+      background-color: #059669;
+    }
+
+    .result {
+      margin-top: 16px;
+      font-size: 1.05rem;
+      font-weight: 600;
+      min-height: 25px;
+    }
+
+    .result.success {
+      color: #10b981;
+    }
+
+    .result.warning {
+      color: #ef4444;
+    }
+
+    .empty-msg {
+      text-align: center;
+      color: #9ca3af;
+      font-size: 0.95rem;
+      padding: 16px 0;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h1>외출 준비물 체크</h1>
+
+    <div class="input-group">
+      <input type="text" id="newItemInput" class="item-input" placeholder="새 준비물 입력" onkeydown="handleEnter(event)">
+      <button type="button" class="add-btn" onclick="addItem()">추가</button>
+    </div>
+
+    <div id="itemList" class="item-list">
+      <div class="item-row">
+        <label class="item-label">
+          <input type="checkbox" class="check-item">
+          <span class="item-name">휴대전화</span>
+        </label>
+        <button type="button" class="delete-btn" onclick="deleteItem(this)" title="삭제">&times;</button>
+      </div>
+      <div class="item-row">
+        <label class="item-label">
+          <input type="checkbox" class="check-item">
+          <span class="item-name">지갑</span>
+        </label>
+        <button type="button" class="delete-btn" onclick="deleteItem(this)" title="삭제">&times;</button>
+      </div>
+      <div class="item-row">
+        <label class="item-label">
+          <input type="checkbox" class="check-item">
+          <span class="item-name">물병</span>
+        </label>
+        <button type="button" class="delete-btn" onclick="deleteItem(this)" title="삭제">&times;</button>
+      </div>
+      <div class="item-row">
+        <label class="item-label">
+          <input type="checkbox" class="check-item">
+          <span class="item-name">우산</span>
+        </label>
+        <button type="button" class="delete-btn" onclick="deleteItem(this)" title="삭제">&times;</button>
+      </div>
+    </div>
+
+    <button type="button" class="check-btn" onclick="checkAll()">준비 확인</button>
+    <div id="resultMessage" class="result"></div>
+  </div>
+
+  <script>
+    function addItem() {
+      const input = document.getElementById('newItemInput');
+      const text = input.value.trim();
+
+      if (!text) {
+        alert('준비물 이름을 입력해 주세요.');
+        return;
+      }
+
+      const list = document.getElementById('itemList');
+
+      const row = document.createElement('div');
+      row.className = 'item-row';
+
+      const label = document.createElement('label');
+      label.className = 'item-label';
+
+      const checkbox = document.createElement('input');
+      checkbox.type = 'checkbox';
+      checkbox.className = 'check-item';
+
+      const span = document.createElement('span');
+      span.className = 'item-name';
+      span.textContent = text;
+
+      const deleteBtn = document.createElement('button');
+      deleteBtn.type = 'button';
+      deleteBtn.className = 'delete-btn';
+      deleteBtn.innerHTML = '&times;';
+      deleteBtn.title = '삭제';
+      deleteBtn.onclick = function () {
+        deleteItem(deleteBtn);
+      };
+
+      label.appendChild(checkbox);
+      label.appendChild(span);
+      row.appendChild(label);
+      row.appendChild(deleteBtn);
+      list.appendChild(row);
+
+      input.value = '';
+      input.focus();
+      clearResult();
+    }
+
+    function deleteItem(btn) {
+      const row = btn.closest('.item-row');
+      row.remove();
+      clearResult();
+    }
+
+    function handleEnter(event) {
+      if (event.key === 'Enter') {
+        addItem();
+      }
+    }
+
+    function clearResult() {
+      const resultMessage = document.getElementById('resultMessage');
+      resultMessage.textContent = '';
+      resultMessage.className = 'result';
+    }
+
+    function checkAll() {
+      const checkboxes = document.querySelectorAll('.check-item');
+      const resultMessage = document.getElementById('resultMessage');
+
+      if (checkboxes.length === 0) {
+        resultMessage.textContent = '확인할 준비물이 없습니다.';
+        resultMessage.className = 'result warning';
+        return;
+      }
+
+      const allChecked = Array.from(checkboxes).every(box => box.checked);
+
+      if (allChecked) {
+        resultMessage.textContent = '준비 완료';
+        resultMessage.className = 'result success';
+      } else {
+        resultMessage.textContent = '아직 챙기지 않은 물건이 있어요!';
+        resultMessage.className = 'result warning';
+      }
+    }
+  </script>
+
+</body>
+</html>
